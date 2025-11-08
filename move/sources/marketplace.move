@@ -1,12 +1,16 @@
 module challenge::marketplace;
 
-use challenge::hero::Hero;
+use challenge::hero::{Hero, hero_power};
 use sui::coin::Coin;
 use sui::event;
 use sui::sui::SUI;
+use sui::object;
 use sui::object::{UID, ID};
 use sui::transfer;
 use sui::tx_context::TxContext;
+use std::string::String;
+use sui::tx_context as tx_context;
+
 
 
 
@@ -90,7 +94,7 @@ public fun list_hero(nft: Hero, price: u64, ctx: &mut TxContext) {
 }
 
 #[allow(lint(self_transfer))]
-public fun buy_hero(list_hero: ListHero, coin: Coin<SUI>, ctx: &mut TxContext) {
+public fun buy_hero(list_hero: ListHero, payment: Coin<SUI>, ctx: &mut TxContext) {
 
     // TODO: Destructure list_hero to get id, nft, price, and seller
         // Hints:
@@ -103,9 +107,9 @@ public fun buy_hero(list_hero: ListHero, coin: Coin<SUI>, ctx: &mut TxContext) {
 
     let ListHero { id, nft, price, seller } = list_hero;
 
-    assert!(coin::value(&coin) == price, EInvalidPayment);
+    assert!(sui::coin::value(&payment) == price, EInvalidPayment);
 
-    transfer::public_transfer(coin, seller);
+    transfer::public_transfer(payment, seller);
 
     let buyer = tx_context::sender(ctx);
     transfer::public_transfer(nft, buyer);
@@ -131,6 +135,12 @@ public fun delist(_: &AdminCap, list_hero: ListHero) {
         // Destructure list_hero (ignore price with "price: _")
     // TODO:Transfer NFT back to original seller
     // TODO:Delete the listing ID (object::delete(id))
+    let ListHero { id, nft, price: _, seller } = list_hero;
+
+    transfer::public_transfer(nft, seller);
+
+    object::delete(id);
+    
 }
 
 public fun change_the_price(_: &AdminCap, list_hero: &mut ListHero, new_price: u64) {
@@ -140,6 +150,8 @@ public fun change_the_price(_: &AdminCap, list_hero: &mut ListHero, new_price: u
     // TODO: Update the listing price
         // Hints:
         // Access the price field of list_hero and update it
+
+    list_hero.price = new_price;
 }
 
 // ========= GETTER FUNCTIONS =========
