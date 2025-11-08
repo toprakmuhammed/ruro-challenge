@@ -1,9 +1,14 @@
 module challenge::marketplace;
 
 use challenge::hero::Hero;
-use sui::coin::{Self, Coin};
+use sui::coin::Coin;
 use sui::event;
 use sui::sui::SUI;
+use sui::object::{UID, ID};
+use sui::transfer;
+use sui::tx_context::TxContext;
+
+
 
 // ========= ERRORS =========
 
@@ -50,6 +55,11 @@ fun init(ctx: &mut TxContext) {
         // Hints:
         // Create AdminCap id with object::new(ctx)
     // TODO: Transfer it to the module publisher (ctx.sender()) using transfer::public_transfer() function
+    let admin_cap = AdminCap {
+        id: object::new(ctx),
+    };
+    transfer::public_transfer(admin_cap, ctx.sender());
+
 }
 
 public fun list_hero(nft: Hero, price: u64, ctx: &mut TxContext) {
@@ -60,6 +70,23 @@ public fun list_hero(nft: Hero, price: u64, ctx: &mut TxContext) {
         // - Set nft, price, and seller (ctx.sender()) fields
     // TODO: Emit HeroListed event with listing details (Don't forget to use object::id(&list_hero) )
     // TODO: Use transfer::share_object() to make it publicly tradeable
+
+    let seller = tx_context::sender(ctx);
+    let list_hero = ListHero {
+        id: object::new(ctx),
+        nft: nft,
+        price: price,
+        seller: seller,
+    };
+
+    event::emit(HeroListed {
+        list_hero_id: object::id(&list_hero),
+        price: price,
+        seller: seller,
+        timestamp: tx_context::epoch_timestamp_ms(ctx),
+    });
+
+    transfer::share_object(list_hero);
 }
 
 #[allow(lint(self_transfer))]
@@ -73,6 +100,25 @@ public fun buy_hero(list_hero: ListHero, coin: Coin<SUI>, ctx: &mut TxContext) {
     // TODO: Transfer hero NFT to buyer (ctx.sender())
     // TODO: Emit HeroBought event with transaction details (Don't forget to use object::uid_to_inner(&id) )
     // TODO: Delete the listing ID (object::delete(id))
+
+    let ListHero { id, nft, price, seller } = list_hero;
+
+    assert!(coin::value(&coin) == price, EInvalidPayment);
+
+    transfer::public_transfer(coin, seller);
+
+    let buyer = tx_context::sender(ctx);
+    transfer::public_transfer(nft, buyer);
+
+    event::emit(HeroBought {
+        list_hero_id: object::uid_to_inner(&id),
+        price: price,
+        buyer: buyer,
+        seller: seller,
+        timestamp: tx_context::epoch_timestamp_ms(ctx),
+    });
+
+    object::delete(id);
 }
 
 // ========= ADMIN FUNCTIONS =========
