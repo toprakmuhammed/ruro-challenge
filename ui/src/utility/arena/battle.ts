@@ -18,4 +18,5 @@ export const battle = (packageId: string, heroId: string, arenaId: string) => {
   // Winner takes both heroes
 
   return tx;
+  
 };
