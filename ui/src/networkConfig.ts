@@ -15,7 +15,7 @@ import { createNetworkConfig } from "@mysten/dapp-kit";
  * └──
  */
 const PACKAGE_ID =
-  "0xff519f0f3208eb54489eda0c6eb160233a44f00e8e0098e00f04222c40696f2f";
+  "0xa00b219fe43635bed1327915ac01cd8fc64773ec09478bb43e169d0d63bede71";
 
 const { networkConfig, useNetworkVariable, useNetworkVariables } =
   createNetworkConfig({

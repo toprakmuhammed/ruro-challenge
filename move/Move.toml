@@ -17,6 +17,7 @@ edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # override use `override = true`
 # Override = { local = "../conflicting/version", override = true }
 
+
 [addresses]
 challenge = "0x0"
 
