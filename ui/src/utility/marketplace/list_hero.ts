@@ -1,30 +1,30 @@
-import { Transaction } from "@mysten/sui/transactions";
+  import { Transaction } from "@mysten/sui/transactions";
 
-export const listHero = (
-  packageId: string,
-  heroId: string,
-  priceInSui: string,
-) => {
-  const tx = new Transaction();
+  export const listHero = (
+    packageId: string,
+    heroId: string,
+    priceInSui: string,
+  ) => {
+    const tx = new Transaction();
 
-  const priceInMist = BigInt(priceInSui) * BigInt(1_000_000_000);
+    const priceInMist = BigInt(priceInSui) * BigInt(1_000_000_000);
 
-  tx.moveCall({
-    target: `${packageId}::marketplace::list_hero`,
-    arguments: [tx.object(heroId), tx.pure.u64(priceInMist)],
-    typeArguments: [],
-  });
+    tx.moveCall({
+      target: `${packageId}::marketplace::list_hero`,
+      arguments: [tx.object(heroId), tx.pure.u64(priceInMist)],
+      typeArguments: [],
+    });
 
-  return tx;
+    return tx;
 
-  // TODO: Convert SUI to MIST (1 SUI = 1,000,000,000 MIST)
-  // const priceInMist = ?
+    // TODO: Convert SUI to MIST (1 SUI = 1,000,000,000 MIST)
+    // const priceInMist = ?
 
-  // TODO: Add moveCall to list a hero for sale
-  // Function: `${packageId}::marketplace::list_hero`
-  // Arguments: heroId (object), priceInMist (u64)
-  // Hints:
-  // - Use tx.object() for the hero object
-  // - Use tx.pure.u64() for the price in MIST
-  // - Remember: 1 SUI = 1_000_000_000 MIST
-};
+    // TODO: Add moveCall to list a hero for sale
+    // Function: `${packageId}::marketplace::list_hero`
+    // Arguments: heroId (object), priceInMist (u64)
+    // Hints:
+    // - Use tx.object() for the hero object
+    // - Use tx.pure.u64() for the price in MIST
+    // - Remember: 1 SUI = 1_000_000_000 MIST
+  };
